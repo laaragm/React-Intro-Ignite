@@ -1,8 +1,7 @@
 import { useState } from 'react'
+import { FiTrash, FiCheckSquare } from 'react-icons/fi'
 
 import '../styles/tasklist.scss'
-
-import { FiTrash, FiCheckSquare } from 'react-icons/fi'
 
 interface Task {
   id: number;
@@ -14,27 +13,59 @@ export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
+  function generateId() {
+    return tasks.length + 1;
+  }
+
+  function buildTask(id: number) {
+    const task: Task = {
+      id: id,
+      title: newTaskTitle,
+      isComplete: false
+    }
+    return task;
+  }
+
+  function clearAddTaskField() {
+    setNewTaskTitle('');
+  }
+
   function handleCreateNewTask() {
-    // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+    if (newTaskTitle !== '') {
+      const id = generateId();
+      const task = buildTask(id);
+      setTasks(prevState => ([...prevState, task]));
+    }
+    clearAddTaskField();
   }
 
   function handleToggleTaskCompletion(id: number) {
-    // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    const updatedTasks = [...tasks];
+    updatedTasks.forEach((task, index) => {
+      if (task.id === id) {
+        const previousStateOfCompletion = updatedTasks[index].isComplete;
+        updatedTasks[index].isComplete = !previousStateOfCompletion;
+      }
+    });
+    console.log(updatedTasks)
+    setTasks(updatedTasks);
   }
 
   function handleRemoveTask(id: number) {
-    // Remova uma task da listagem pelo ID
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    console.log(updatedTasks)
+    setTasks(updatedTasks);
   }
 
   return (
     <section className="task-list container">
       <header>
-        <h2>Minhas tasks</h2>
+        <h2>My tasks</h2>
 
         <div className="input-group">
           <input 
             type="text" 
-            placeholder="Adicionar novo todo" 
+            placeholder="Add new todo" 
             onChange={(e) => setNewTaskTitle(e.target.value)}
             value={newTaskTitle}
           />
